@@ -68,6 +68,7 @@ code{background:#eef2f9;padding:1px 6px;border-radius:5px;font-size:12.5px}
 <a href="#resumo">Resumo da semana</a>
 <a href="#nfs" class="star">★ NFs com a Dayane</a>
 <a href="#iso" class="star">★ Documentos da ISO</a>
+<a href="#ciop" class="star">★ Planilha de coberturas (CIOP)</a>
 <a href="#regras">Regras e decisões</a>
 <a href="#analises">Análises e planejamento</a>
 <a href="#pend">Pendências</a>
@@ -150,19 +151,13 @@ code{background:#eef2f9;padding:1px 6px;border-radius:5px;font-size:12.5px}
 <tr><td><b>Acompanhamento ISO 9001</b></td><td>Planilha com o plano de ação por fase, responsável, prazo, status, evidência e cláusula.</td><td>todas</td></tr>
 </tbody></table></div></div>
 
-<div class="grid2">
-<div class="card"><h3>Plano de ação: situação das 22 ações</h3>
-<div class="bar"><span>Concluídas</span><div class="trk"><div class="fill b" style="width:4.5%"></div></div><b>1</b></div>
-<div class="bar"><span>Em andamento</span><div class="trk"><div class="fill y" style="width:27.3%"></div></div><b>6</b></div>
-<div class="bar"><span>Não iniciadas</span><div class="trk"><div class="fill gr" style="width:68.2%"></div></div><b>15</b></div>
-<p class="small">Leitura da aba “Plano de ação” em 19/11/2026. Concluída: confirmar o escopo (DS-007).</p></div>
 <div class="card"><h3>Decisões da semana</h3><ul>
 <li>Escopo da Política da Qualidade (DS-007) mantido sem alteração; a sugestão Rev.01 não deve ser aprovada.</li>
 <li>Um único modelo de OS (OSM) no lugar de três.</li>
 <li>Reaproveitar o RE-013-8.4-RPA para avaliação de prestadores, sem criar o RE-AVP.</li>
 <li>Prestadores PJ: o texto comunica, não impõe horários nem regras.</li>
 <li>Registros preenchidos na estrutura oficial (RE-GERADOS, com backup), conforme DS-013.</li>
-</ul></div></div>
+</ul></div>
 
 <div class="card"><h3>Próximos prazos do plano</h3><div class="tw"><table><thead><tr><th>Prazo</th><th>Ação</th><th>Status</th></tr></thead><tbody>
 <tr><td>20/11</td><td>Decidir padrão de código e tipo IT (DS-013); reservar os números XXX no RE-008</td><td><span class="tag t-no">não iniciado</span></td></tr>
@@ -173,6 +168,37 @@ code{background:#eef2f9;padding:1px 6px;border-radius:5px;font-size:12.5px}
 <tr><td>Jan/2027</td><td>Treinamento, comunicado formal aos prestadores e fechamento de janeiro nos novos registros</td><td><span class="tag t-no">não iniciado</span></td></tr>
 </tbody></table></div></div>
 <div class="note b"><b>Pontos que dependem de confirmação:</b> Rev.00 ou Rev.02 do PR (se o ASQ Rev.01 já consta aprovado no RE-008); 2 CNPJs divergentes no CDQ (Grupo Fibra e TN); dia 06/07 do Sispoli e vencimento dia 13 vieram do diagnóstico, sem outra fonte; ainda sem número XXX e sem aprovação do RD e da Alta Direção.</div>
+</section>
+
+<section id="ciop">
+<h2 class="sec">Planilha de coberturas do CIOP<span class="pill">Novo</span></h2>
+<p class="lead">Automação do lançamento das coberturas de postos na planilha COBERTURAS_UNIFICADO (Google Sheets), a partir dos formulários manuscritos de Controle de Reserva Técnica (RE.OPE.14-CRT). Documentada em 19/11/2026.</p>
+<div class="grid2">
+<div class="card hl"><h3>O que ela resolve</h3><ul>
+<li><b>Caligrafia que o OCR não lê bem:</b> o OCR do Drive mistura colunas e erra letra cursiva. A leitura passa a ser feita por um Gem no Gemini (“Extrator de Coberturas – Tektron”).</li>
+<li><b>Digitação manual e erros de padronização:</b> o Gem confere nomes de postos, contratos, supervisores e valores contra a própria planilha e devolve o bloco pronto, em caixa alta e com data DD/MM/AAAA.</li>
+<li><b>Valor fora da tabela:</b> o Gem alerta quando o valor manuscrito foge da tabela oficial (R$ 70, 90, 110, 150 e 200) antes de entrar na planilha.</li>
+<li><b>Fórmulas quebradas na colagem:</b> o script grava só nas colunas A:G, na primeira linha livre da coluna A, sem jogar os dados para depois da linha 501 e sem apagar as fórmulas das colunas H:K.</li>
+<li><b>Custo e complexidade:</b> sem API externa paga e sem configuração técnica para quem usa.</li>
+</ul></div>
+<div class="card"><h3>Como funciona</h3>
+<div class="tw"><table><thead><tr><th>Etapa</th><th>O que acontece</th></tr></thead><tbody>
+<tr><td>1. Digitalizar</td><td>Formulário manuscrito em PDF ou imagem.</td></tr>
+<tr><td>2. Ler e validar</td><td>O Gem lê o arquivo e consulta BASE_CONTRATOS, DE_PARA, LANCAMENTOS, TOTAL_TOMADORA e VALORES_PRATICADOS.</td></tr>
+<tr><td>3. Importar</td><td>Menu “Importar Coberturas” na planilha: cola o bloco do Gem (separado por ponto e vírgula) e o Apps Script grava em LANCAMENTOS A:G.</td></tr>
+<tr><td>4. Resumir</td><td>As fórmulas alimentam RESUMO_FINANCEIRO (posto, tomadora, valor e supervisor) e TOTAL_TOMADORA.</td></tr>
+</tbody></table></div>
+<p class="small">Para o Gem enxergar contratos, supervisores ou apelidos novos, abrir uma conversa nova nele.</p></div></div>
+<div class="card"><h3>Colunas gravadas em LANCAMENTOS</h3><div class="tw"><table><thead><tr><th>Coluna</th><th>Campo</th><th>Regra</th></tr></thead><tbody>
+<tr><td>A</td><td>Posto de serviço</td><td>Caixa alta, validado na base e no DE_PARA</td></tr>
+<tr><td>B</td><td>Faltoso</td><td>Caixa alta, nome completo</td></tr>
+<tr><td>C</td><td>Substituto</td><td>Caixa alta, nome completo</td></tr>
+<tr><td>D</td><td>Motivo</td><td>Caixa alta (atestado, falta, desaparecido, remanejado)</td></tr>
+<tr><td>E</td><td>Data</td><td>DD/MM/AAAA, ano com 4 dígitos</td></tr>
+<tr><td>F</td><td>Valor (R$)</td><td>Número, sem “R$”</td></tr>
+<tr><td>G</td><td>Supervisor (fiscal)</td><td>Caixa alta, nome padronizado</td></tr>
+</tbody></table></div>
+<div class="note b"><b>Em aberto:</b> a planilha é usada por outra pessoa, que limpa a aba a cada ciclo. Você pediu um playbook para estagiário e o bloqueio das colunas de fórmulas; não confirmei nesta semana se os dois já foram feitos.</div></div>
 </section>
 
 <section id="regras">
